@@ -1,7 +1,8 @@
-// @ts-check
-
+import '@testing-library/jest-dom';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { screen } from '@testing-library/dom';
+// import testingLibraryUserEvent from '@testing-library/user-event';
 import init from '../src/init';
 
 beforeEach(async () => {
@@ -10,7 +11,7 @@ beforeEach(async () => {
   document.body.innerHTML = html;
 });
 
-test('init', () => {
+test('init', async () => {
   init();
-  expect(true).toBeDefined();
+  expect(document.body).toHaveTextContent('RSS Reader');
 });
