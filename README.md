@@ -1,5 +1,6 @@
 ### Hexlet tests and linter status:
-[![Actions Status](https://github.com/fey/frontend-project-lvl3/workflows/hexlet-check/badge.svg)](https://github.com/fey/frontend-project-lvl3/actions)
+[![Actions Status](https://github.com/fey/frontend-project-lvl3/workflows/hexlet-check/badge.svg)](https://github.com/fey/frontend-project-lvl3/actions?query=workflow%3Ahexlet-check)
+[![Actions Status](https://github.com/fey/frontend-project-lvl3/workflows/Node%20CI/badge.svg)](https://github.com/fey/frontend-project-lvl3/actions?query=workflow%3A%22Node+CI%22)
 
 ### Description
 
