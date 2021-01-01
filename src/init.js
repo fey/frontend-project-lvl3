@@ -13,11 +13,27 @@ const validate = (url) => {
   }
 };
 
+const convertItem = (item) => {
+  const title = item.querySelector('title').textContent;
+  const link = item.querySelector('link').textContent;
+  const description = item.querySelector('description').textContent;
+
+  return { title, description, link };
+};
+
 const parse = (data) => {
   const parser = new DOMParser();
   const content = parser.parseFromString(data, 'text/xml');
+  console.log(content);
+  const title = content.querySelector('channel > title').textContent;
+  const description = content.querySelector('channel > description').textContent.trim();
+  const posts = [];
 
-  return content;
+  content.querySelectorAll('channel > item').forEach((item) => {
+    posts.push(convertItem(item));
+  });
+
+  return { title, description, posts };
 };
 
 const render = (state) => {
@@ -27,25 +43,28 @@ const render = (state) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const error = validate(formData.get('url'));
-    console.log(error);
     if (error) {
-      state.form.state = 'invalid';
-      state.form.error = error;
+      state = {
+        ...state,
+        form: {
+          state: 'invalid',
+          error,
+        },
+      };
 
       return;
     }
-
-    state.form.state = 'valid';
-
     const url = formData.get('url');
     const requestUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
     state.button.disabled = true;
     Axios.get(requestUrl)
       .then((res) => {
-        console.log(parse(res.data.contents));
-        state.button.disabled = false;
-        // console.log(`${res.data}`);
-        // console.log(parse(res.data));
+        const feed = parse(res.data.contents);
+        state = {
+          ...state,
+          feeds: [...state.feeds, feed],
+          button: { disabled: false },
+        };
       });
   });
 
@@ -62,7 +81,6 @@ const render = (state) => {
     const feedback = document.querySelector('form > .invalid-feedback');
     const input = document.getElementById('form-url');
     input.classList.remove('is-invalid');
-    // input.classList.add('is-valid');
     if (feedback) {
       feedback.remove();
     }
