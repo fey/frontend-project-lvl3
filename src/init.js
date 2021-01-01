@@ -68,7 +68,7 @@ export default () => {
         watchedState.posts = [...posts, ...watchedState.posts];
       })
       .catch((err) => {
-        watchedState.form = { error: err, state: 'invalid' };
+        watchedState.form = { error: 'Something went wrong', state: 'invalid' };
       }).finally(() => {
         watchedState.button = { disabled: false };
       });
