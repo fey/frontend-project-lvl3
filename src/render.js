@@ -53,6 +53,7 @@ const buildPostsList = (posts) => {
 };
 
 const render = (state) => {
+  console.log(state);
   const input = document.getElementById('form-url');
   const feedback = document.querySelector('form > .invalid-feedback') ?? document.createElement('div');
   input.classList.remove('is-invalid');

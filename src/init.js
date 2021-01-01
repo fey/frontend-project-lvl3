@@ -4,7 +4,7 @@ import parse from './parser';
 import validate from './validator';
 import render from './render';
 
-const buildFeed = (feedData, url) => {
+const buildFeed = (rss, url) => {
   const convertItem = (item) => {
     const title = item.querySelector('title').textContent;
     const link = item.querySelector('link').textContent;
@@ -12,13 +12,11 @@ const buildFeed = (feedData, url) => {
 
     return { title, description, link };
   };
-  const content = parse(feedData);
-  console.log(content);
-  const title = content.querySelector('channel > title').textContent;
-  const description = content.querySelector('channel > description').textContent.trim();
+  const title = rss.querySelector('channel > title').textContent;
+  const description = rss.querySelector('channel > description').textContent.trim();
   const posts = [];
 
-  content.querySelectorAll('channel > item').forEach((item) => {
+  rss.querySelectorAll('channel > item').forEach((item) => {
     posts.push(convertItem(item));
   });
 
@@ -53,21 +51,22 @@ export default () => {
       return;
     }
     const url = formData.get('url');
-    // watchedState.button.disabled = true;
-
-    const alreadyExists = watchedState.feeds.find(({ url: feedUrl }) => feedUrl === url);
+    const alreadyExists = onChange.target(watchedState).feeds.find((feed) => feed.url === url);
 
     if (alreadyExists) {
-      watchedState.error = 'Rss already exists';
+      watchedState.form.error = 'Rss already exists';
+      watchedState.form.state = 'invalid';
+      return;
     }
-    console.log(url);
+
+    watchedState.button.disabled = true;
     get('https://api.allorigins.win/get', { params: { url } })
       .then((res) => {
         const parsed = parse(res.data.contents);
-        const { feed, posts } = buildFeed(parsed);
+        const { feed, posts } = buildFeed(parsed, url);
         watchedState.feeds = [feed, ...watchedState.feeds];
         watchedState.posts = [...posts, ...watchedState.posts];
-        // watchedState.button = { disabled: false };
+        watchedState.button = { disabled: false };
       });
   });
 
