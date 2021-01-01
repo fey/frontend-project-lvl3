@@ -48,7 +48,6 @@ const buildPostsList = (posts) => {
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.textContent = post.title;
-    console.log(post);
 
     const button = document.createElement('button');
     button.classList.add('btn', 'btn-primary', 'btn-sm');
@@ -70,20 +69,17 @@ const buildPostsList = (posts) => {
 };
 
 const render = (state) => {
-  console.log(state);
-  // const form = document.getElementById('rss-form');
-
   const input = document.getElementById('form-url');
-  const feedback = document.querySelector('form > .invalid-feedback');
+  const feedback = document.querySelector('form > .invalid-feedback') ?? document.createElement('div');
   input.classList.remove('is-invalid');
+  const submit = document.querySelector('input[type="submit"]');
+  submit.disabled = state.button.disabled;
 
   if (feedback) {
     feedback.remove();
   }
 
   if (state.form.state === 'invalid') {
-    const input = document.getElementById('form-url');
-    const feedback = document.createElement('div');
     feedback.classList.add('invalid-feedback');
     feedback.textContent = state.form.error;
     input.after(feedback);
@@ -106,7 +102,7 @@ const render = (state) => {
   if (state.feeds.length !== 0) {
     const postsTitle = document.createElement('h2');
     postsTitle.textContent = 'Posts';
-    const postsList = buildPostsList(state.feeds[0].posts);
+    const postsList = buildPostsList(state.posts);
 
     postsContainer.append(postsTitle, postsList);
   }
@@ -122,6 +118,7 @@ export default () => {
       state: 'valid', // invalid
     },
     feeds: [],
+    posts: [],
   };
   const watchedState = onChange(state, () => render(watchedState));
 
@@ -147,8 +144,9 @@ export default () => {
       },
     })
       .then((res) => {
-        const feed = parse(res.data.contents);
-        watchedState.feeds = [...watchedState.feeds, feed];
+        const { feed, posts } = parse(res.data.contents);
+        watchedState.feeds = [feed, ...watchedState.feeds];
+        watchedState.posts = [...posts, ...watchedState.posts];
         watchedState.button = { disabled: false };
       });
   });

@@ -8,8 +8,7 @@ const parse = (data) => {
   };
   const parser = new DOMParser();
   const content = parser.parseFromString(data, 'text/xml');
-  console.log(content);
-  
+
   const title = content.querySelector('channel > title').textContent;
   const description = content.querySelector('channel > description').textContent.trim();
   const posts = [];
@@ -18,7 +17,7 @@ const parse = (data) => {
     posts.push(parseItem(item));
   });
 
-  return { title, description, posts };
+  return { feed: { title, description }, posts };
 };
 
 export default parse;
