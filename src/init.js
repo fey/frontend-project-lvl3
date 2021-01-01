@@ -40,6 +40,7 @@ export default () => {
   const form = document.getElementById('rss-form');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    watchedState.form = { error: null, state: 'valid' };
     const formData = new FormData(e.target);
     const error = validate(formData.get('url'));
     if (error) {
@@ -54,8 +55,7 @@ export default () => {
     const alreadyExists = onChange.target(watchedState).feeds.find((feed) => feed.url === url);
 
     if (alreadyExists) {
-      watchedState.form.error = 'Rss already exists';
-      watchedState.form.state = 'invalid';
+      watchedState.form = { error: 'Rss already exists', state: 'invalid' };
       return;
     }
 
@@ -66,6 +66,10 @@ export default () => {
         const { feed, posts } = buildFeed(parsed, url);
         watchedState.feeds = [feed, ...watchedState.feeds];
         watchedState.posts = [...posts, ...watchedState.posts];
+      })
+      .catch((err) => {
+        watchedState.form = { error: err, state: 'invalid' };
+      }).finally(() => {
         watchedState.button = { disabled: false };
       });
   });
