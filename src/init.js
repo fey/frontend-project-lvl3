@@ -1,6 +1,7 @@
 import Axios from 'axios';
 import onChange from 'on-change';
 import * as yup from 'yup';
+import parse from './parser';
 
 const validate = (url) => {
   const schema = yup.string().url().required();
@@ -13,60 +14,72 @@ const validate = (url) => {
   }
 };
 
-const convertItem = (item) => {
-  const title = item.querySelector('title').textContent;
-  const link = item.querySelector('link').textContent;
-  const description = item.querySelector('description').textContent;
+const buildFeedList = (feeds) => {
+  const buildFeedListItem = (feed) => {
+    const li = document.createElement('li');
+    const h2 = document.createElement('h3');
+    const p = document.createElement('p');
 
-  return { title, description, link };
-};
+    li.classList.add('list-group-item');
+    li.append(h2, p);
+    h2.textContent = feed.title;
+    p.textContent = feed.description;
 
-const parse = (data) => {
-  const parser = new DOMParser();
-  const content = parser.parseFromString(data, 'text/xml');
-  console.log(content);
-  const title = content.querySelector('channel > title').textContent;
-  const description = content.querySelector('channel > description').textContent.trim();
-  const posts = [];
+    return li;
+  };
 
-  content.querySelectorAll('channel > item').forEach((item) => {
-    posts.push(convertItem(item));
+  const ul = document.createElement('ul');
+  ul.classList.add('list-group', 'mb-5');
+  feeds.forEach((feed) => {
+    const feedEl = buildFeedListItem(feed);
+    ul.append(feedEl);
   });
 
-  return { title, description, posts };
+  return ul;
+};
+
+const buildPostsList = (posts) => {
+  const buildItem = (post) => {
+    const li = document.createElement('li');
+    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+    const link = document.createElement('a');
+    link.classList.add(post.isRead ? 'fw-normal' : 'fw-bold');
+    link.href = post.link;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = post.title;
+    console.log(post);
+
+    const button = document.createElement('button');
+    button.classList.add('btn', 'btn-primary', 'btn-sm');
+    button.textContent = 'Preview';
+
+    li.append(link, button);
+
+    return li;
+  };
+
+  const ul = document.createElement('ul');
+  ul.classList.add('list-group');
+
+  posts.forEach((post) => {
+    ul.append(buildItem(post));
+  });
+
+  return ul;
 };
 
 const render = (state) => {
-  const form = document.getElementById('rss-form');
+  console.log(state);
+  // const form = document.getElementById('rss-form');
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const error = validate(formData.get('url'));
-    if (error) {
-      state = {
-        ...state,
-        form: {
-          state: 'invalid',
-          error,
-        },
-      };
+  const input = document.getElementById('form-url');
+  const feedback = document.querySelector('form > .invalid-feedback');
+  input.classList.remove('is-invalid');
 
-      return;
-    }
-    const url = formData.get('url');
-    const requestUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-    state.button.disabled = true;
-    Axios.get(requestUrl)
-      .then((res) => {
-        const feed = parse(res.data.contents);
-        state = {
-          ...state,
-          feeds: [...state.feeds, feed],
-          button: { disabled: false },
-        };
-      });
-  });
+  if (feedback) {
+    feedback.remove();
+  }
 
   if (state.form.state === 'invalid') {
     const input = document.getElementById('form-url');
@@ -77,13 +90,25 @@ const render = (state) => {
     input.classList.add('is-invalid');
   }
 
-  if (state.form.state === 'valid') {
-    const feedback = document.querySelector('form > .invalid-feedback');
-    const input = document.getElementById('form-url');
-    input.classList.remove('is-invalid');
-    if (feedback) {
-      feedback.remove();
-    }
+  const feedsContainer = document.getElementById('feeds');
+  feedsContainer.innerHTML = '';
+
+  if (state.feeds.length !== 0) {
+    const listTitle = document.createElement('h2');
+    listTitle.textContent = 'Feeds';
+    const feedsList = buildFeedList(state.feeds);
+    feedsContainer.append(listTitle, feedsList);
+  }
+
+  const postsContainer = document.getElementById('posts');
+  postsContainer.innerHTML = '';
+
+  if (state.feeds.length !== 0) {
+    const postsTitle = document.createElement('h2');
+    postsTitle.textContent = 'Posts';
+    const postsList = buildPostsList(state.feeds[0].posts);
+
+    postsContainer.append(postsTitle, postsList);
   }
 };
 
@@ -93,13 +118,40 @@ export default () => {
       disabled: false,
     },
     form: {
-      errors: null,
+      error: null,
       state: 'valid', // invalid
     },
     feeds: [],
   };
-
   const watchedState = onChange(state, () => render(watchedState));
+
+  const form = document.getElementById('rss-form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const error = validate(formData.get('url'));
+    if (error) {
+      watchedState.form = {
+        state: 'invalid',
+        error,
+      };
+
+      return;
+    }
+    const url = formData.get('url');
+    const requestUrl = 'https://api.allorigins.win/get';
+    watchedState.button.disabled = true;
+    Axios.get(requestUrl, {
+      params: {
+        url,
+      },
+    })
+      .then((res) => {
+        const feed = parse(res.data.contents);
+        watchedState.feeds = [...watchedState.feeds, feed];
+        watchedState.button = { disabled: false };
+      });
+  });
 
   render(watchedState);
 };
