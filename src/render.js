@@ -4,6 +4,8 @@ import {
   SUBMITTED,
   SUBMITTING,
   FAILED,
+  SUCCESS,
+  ERROR,
 } from './consts.js';
 
 const buildFeedList = (feeds) => {
@@ -123,11 +125,11 @@ const renderMessage = ({ type, text }) => {
   }
 
   switch (type) {
-    case 'success':
+    case SUCCESS:
       feedback.classList.add('text-success');
       feedback.classList.remove('text-danger');
       break;
-    case 'error':
+    case ERROR:
       feedback.classList.remove('text-success');
       feedback.classList.add('text-danger');
       break;
