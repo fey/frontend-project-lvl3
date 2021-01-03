@@ -1,5 +1,6 @@
 import { get } from 'axios';
 import onChange from 'on-change';
+import i18next from 'i18next';
 import parse from './parser';
 import validate from './validator';
 import render from './render';
@@ -29,7 +30,40 @@ const buildFeed = (rss, url) => {
   return { feed: { title, description, url }, posts };
 };
 
-export default () => {
+export default () => i18next.init({
+  lng: 'en',
+  debug: true,
+  resources: {
+    ru: {
+      translation: {
+        title: 'RSS Reader',
+        subtitle: 'Начните читать RSS уже сегодня! Это легко, это приятно.',
+        preview: 'Предпросмотр',
+        feeds: 'Потоки',
+        posts: 'Посты',
+        add: 'Добавить',
+        exists: 'Поток уже добавлен',
+        success_load: 'Поток загружен',
+        must_be_url: 'должен быть действительный URL-адрес',
+        something_went_wrong: 'Something went wrong',
+      },
+    },
+    en: {
+      translation: {
+        title: 'RSS Reader',
+        subtitle: 'Start reading RSS today! It is easy, it is nicely.',
+        preview: 'Preview',
+        feeds: 'Feeds',
+        posts: 'Posts',
+        add: 'Add',
+        exists: 'RSS already exists',
+        success_load: 'Rss has been loaded',
+        must_be_url: '{{value}} must be a valid URL',
+        something_went_wrong: 'Упс, что-то пошло не так',
+      },
+    },
+  },
+}).then(() => {
   const state = {
     form: {
       message: {
@@ -74,7 +108,7 @@ export default () => {
       watchedState.form.state = FAILED;
       watchedState.form.message = {
         type: 'error',
-        text: 'RSS already exists',
+        text: 'exists',
       };
 
       return;
@@ -89,17 +123,17 @@ export default () => {
         watchedState.form.state = SUBMITTED;
         watchedState.form.message = {
           type: 'success',
-          text: 'Rss has been loaded',
+          text: 'success_load',
         };
       })
-      .catch((error) => {
+      .catch(() => {
         watchedState.form.state = FAILED;
         watchedState.form.message = {
           type: 'error',
-          text: error,
+          text: 'something_went_wrong',
         };
       });
   });
 
   render(watchedState);
-};
+});

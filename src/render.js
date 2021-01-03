@@ -1,3 +1,4 @@
+import i18next from 'i18next';
 import onChange from 'on-change';
 import {
   FILLING,
@@ -45,7 +46,7 @@ const buildPostsList = (posts) => {
 
     const button = document.createElement('button');
     button.classList.add('btn', 'btn-primary', 'btn-sm');
-    button.textContent = 'Preview';
+    button.textContent = i18next.t('preview');
 
     li.append(link, button);
 
@@ -64,8 +65,9 @@ const buildPostsList = (posts) => {
 
 const handleForm = (stateValue) => {
   const input = document.getElementById('form-url');
-  const submit = document.getElementsByName('submit');
+  const submit = document.getElementById('form-submit');
   input.classList.remove('is-invalid');
+  submit.value = i18next.t('add');
 
   switch (stateValue) {
     case FILLING:
@@ -77,6 +79,7 @@ const handleForm = (stateValue) => {
       submit.disabled = true;
       break;
     case FAILED:
+      submit.disabled = false;
       input.classList.add('is-invalid');
       break;
     default:
@@ -93,7 +96,7 @@ const renderFeeds = (feeds) => {
   feedsContainer.innerHTML = '';
 
   const listTitle = document.createElement('h2');
-  listTitle.textContent = 'Feeds';
+  listTitle.textContent = i18next.t('feeds');
   const feedsList = buildFeedList(feeds);
 
   feedsContainer.append(listTitle, feedsList);
@@ -108,7 +111,7 @@ const renderPosts = (posts) => {
   postsContainer.innerHTML = '';
 
   const postsTitle = document.createElement('h2');
-  postsTitle.textContent = 'Posts';
+  postsTitle.textContent = i18next.t('posts');
   const postsList = buildPostsList(posts);
 
   postsContainer.append(postsTitle, postsList);
@@ -137,12 +140,15 @@ const renderMessage = ({ type, text }) => {
       feedback.remove();
       return;
   }
-  feedback.textContent = text;
+  feedback.textContent = i18next.t(text);
   submit.after(feedback);
 };
 
 const render = (state, path, value) => {
   console.log(onChange.target(state));
+  const submit = document.getElementById('form-submit');
+  submit.value = i18next.t('add');
+
   switch (path) {
     case 'form.state':
       handleForm(value);
