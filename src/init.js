@@ -3,6 +3,12 @@ import onChange from 'on-change';
 import parse from './parser';
 import validate from './validator';
 import render from './render';
+import {
+  FILLING,
+  SUBMITTED,
+  SUBMITTING,
+  FAILED,
+} from './consts.js';
 
 const buildFeed = (rss, url) => {
   const convertItem = (item) => {
@@ -25,52 +31,73 @@ const buildFeed = (rss, url) => {
 
 export default () => {
   const state = {
-    button: {
-      disabled: false,
-    },
     form: {
-      error: null,
-      state: 'valid', // invalid
+      message: {
+        type: null,
+        text: '',
+      },
+      state: FILLING,
+      /**
+       * filling
+        -> submitted
+        -> submitting
+        -> failed
+       */
     },
     feeds: [],
     posts: [],
   };
-  const watchedState = onChange(state, () => render(watchedState));
-
+  const watchedState = onChange(state, (path, value) => render(watchedState, path, value));
   const form = document.getElementById('rss-form');
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    watchedState.form = { error: null, state: 'valid' };
+    watchedState.form.state = SUBMITTING;
+
     const formData = new FormData(e.target);
-    const error = validate(formData.get('url'));
-    if (error) {
-      watchedState.form = {
-        state: 'invalid',
-        error,
+    const validationMessage = validate(formData.get('url'));
+
+    if (validationMessage) {
+      watchedState.form.state = FAILED;
+      watchedState.form.message = {
+        type: 'error',
+        text: validationMessage,
       };
 
       return;
     }
+
     const url = formData.get('url');
-    const alreadyExists = onChange.target(watchedState).feeds.find((feed) => feed.url === url);
+    const alreadyExists = state.feeds.find((feed) => feed.url === url);
 
     if (alreadyExists) {
-      watchedState.form = { error: 'Rss already exists', state: 'invalid' };
+      watchedState.form.state = FAILED;
+      watchedState.form.message = {
+        type: 'error',
+        text: 'RSS already exists',
+      };
+
       return;
     }
 
-    watchedState.button.disabled = true;
     get('https://api.allorigins.win/get', { params: { url } })
       .then((res) => {
         const parsed = parse(res.data.contents);
         const { feed, posts } = buildFeed(parsed, url);
         watchedState.feeds = [feed, ...watchedState.feeds];
         watchedState.posts = [...posts, ...watchedState.posts];
+        watchedState.form.state = SUBMITTED;
+        watchedState.form.message = {
+          type: 'success',
+          text: 'Rss has been loaded',
+        };
       })
-      .catch((err) => {
-        watchedState.form = { error: 'Something went wrong', state: 'invalid' };
-      }).finally(() => {
-        watchedState.button = { disabled: false };
+      .catch((error) => {
+        watchedState.form.state = FAILED;
+        watchedState.form.message = {
+          type: 'error',
+          text: error,
+        };
       });
   });
 
