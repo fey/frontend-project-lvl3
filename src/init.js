@@ -1,6 +1,7 @@
 import { get } from 'axios';
 import onChange from 'on-change';
 import i18next from 'i18next';
+import { sha1 } from 'object-hash';
 import parse from './parser';
 import validate from './validator';
 import render from './render';
@@ -16,8 +17,11 @@ const buildFeed = (rss, url) => {
     const title = item.querySelector('title').textContent;
     const link = item.querySelector('link').textContent;
     const description = item.querySelector('description').textContent;
+    const hash = sha1(JSON.stringify({ title, description, link }));
 
-    return { title, description, link };
+    return {
+      title, description, link, hash,
+    };
   };
   const title = rss.querySelector('channel > title').textContent;
   const description = rss.querySelector('channel > description').textContent.trim();
@@ -29,6 +33,29 @@ const buildFeed = (rss, url) => {
 
   return { feed: { title, description, url }, posts };
 };
+
+const loadPosts = (state, feed) => {
+  const { url } = feed;
+  get('https://api.allorigins.win/raw', { params: { url } })
+    .then((res) => {
+      const parsed = parse(res.data);
+      const { posts } = buildFeed(parsed, url);
+      const newPosts = posts.filter((post) => {
+        const exists = state.posts.find((storedPost) => storedPost.hash === post.hash);
+
+        return Boolean(!exists);
+      });
+
+      if (newPosts.length === 0) {
+        return;
+      }
+
+      console.log(newPosts);
+      state.posts = [...newPosts, ...state.posts];
+    });
+  setTimeout(() => loadPosts(state, feed), 5000);
+};
+
 
 export default () => i18next.init({
   lng: 'en',
@@ -45,7 +72,8 @@ export default () => i18next.init({
         exists: 'Поток уже добавлен',
         success_load: 'Поток загружен',
         must_be_url: 'должен быть действительный URL-адрес',
-        something_went_wrong: 'Something went wrong',
+        something_went_wrong: 'Упс, что-то пошло не так',
+
       },
     },
     en: {
@@ -59,7 +87,7 @@ export default () => i18next.init({
         exists: 'RSS already exists',
         success_load: 'Rss has been loaded',
         must_be_url: '{{value}} must be a valid URL',
-        something_went_wrong: 'Упс, что-то пошло не так',
+        something_went_wrong: 'Something went wrong',
       },
     },
   },
@@ -114,9 +142,9 @@ export default () => i18next.init({
       return;
     }
 
-    get('https://api.allorigins.win/get', { params: { url } })
+    get('https://api.allorigins.win/raw', { params: { url } })
       .then((res) => {
-        const parsed = parse(res.data.contents);
+        const parsed = parse(res.data);
         const { feed, posts } = buildFeed(parsed, url);
         watchedState.feeds = [feed, ...watchedState.feeds];
         watchedState.posts = [...posts, ...watchedState.posts];
@@ -125,12 +153,15 @@ export default () => i18next.init({
           type: 'success',
           text: 'success_load',
         };
+
+        setTimeout(() => loadPosts(watchedState, feed), 5000);
       })
-      .catch(() => {
+      .catch((error) => {
         watchedState.form.state = FAILED;
         watchedState.form.message = {
           type: 'error',
-          text: 'something_went_wrong',
+          text: error,
+          // text: 'something_went_wrong',
         };
       });
   });

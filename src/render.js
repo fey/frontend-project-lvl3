@@ -46,6 +46,8 @@ const buildPostsList = (posts) => {
 
     const button = document.createElement('button');
     button.classList.add('btn', 'btn-primary', 'btn-sm');
+    button.dataset.toggle = 'modal';
+    button.dataset.target = '#myModal';
     button.textContent = i18next.t('preview');
 
     li.append(link, button);
