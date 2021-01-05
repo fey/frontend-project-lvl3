@@ -56,7 +56,6 @@ const loadPosts = (state, feed) => {
   setTimeout(() => loadPosts(state, feed), 5000);
 };
 
-
 export default () => i18next.init({
   lng: 'en',
   debug: true,
@@ -108,6 +107,7 @@ export default () => i18next.init({
     },
     feeds: [],
     posts: [],
+    readedPosts: [],
   };
   const watchedState = onChange(state, (path, value) => render(watchedState, path, value));
   const form = document.getElementById('rss-form');

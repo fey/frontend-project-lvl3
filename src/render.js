@@ -33,7 +33,7 @@ const buildFeedList = (feeds) => {
   return ul;
 };
 
-const buildPostsList = (posts) => {
+const buildPostsList = (posts, state) => {
   const buildItem = (post) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
@@ -43,12 +43,23 @@ const buildPostsList = (posts) => {
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.textContent = post.title;
+    link.addEventListener('click', () => {
+      post.isRead = true;
+    });
 
     const button = document.createElement('button');
     button.classList.add('btn', 'btn-primary', 'btn-sm');
-    button.dataset.toggle = 'modal';
-    button.dataset.target = '#myModal';
+    button.dataset.bsToggle = 'modal';
+    button.dataset.bsTarget = '#myModal';
+    button.dataset.bsTitle = post.title;
+    button.dataset.bsBody = post.description;
     button.textContent = i18next.t('preview');
+    const modal = document.getElementById('myModal');
+
+    modal.addEventListener('show.bs.modal', ({ relatedTarget }) => {
+      const title = relatedTarget.dataset.bsTitle;
+      console.log(title);
+    });
 
     li.append(link, button);
 
@@ -162,7 +173,7 @@ const render = (state, path, value) => {
       renderFeeds(value);
       break;
     case 'posts':
-      renderPosts(value);
+      renderPosts(value, state);
       break;
     default:
       break;
