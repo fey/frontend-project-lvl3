@@ -28,5 +28,4 @@ export default {
       something_went_wrong: 'Something went wrong',
     },
   },
-}
 };
