@@ -1,6 +1,6 @@
 import i18next from 'i18next';
-import onChange from 'on-change';
-import { target } from '../node_modules/on-change/index.js';
+import onChange, { target } from 'on-change';
+
 import {
   FILLING,
   SUBMITTED,
@@ -56,17 +56,14 @@ const buildPostsList = (posts, state) => {
     button.classList.add('btn', 'btn-primary', 'btn-sm');
     button.dataset.bsToggle = 'modal';
     button.dataset.bsTarget = '#article-preview';
-    button.dataset.bsTitle = post.title;
-    button.dataset.bsBody = post.description;
-    button.dataset.bsLink = post.link;
     button.textContent = i18next.t('preview');
     const modal = document.getElementById('article-preview');
+    button.addEventListener('click', () => markPostRead(state, post));
 
-    modal.addEventListener('show.bs.modal', ({ relatedTarget }) => {
-      markPostRead(state, post);
-      const title = relatedTarget.dataset.bsTitle;
-      const body = relatedTarget.dataset.bsBody;
-      const url = relatedTarget.dataset.bsLink;
+    modal.addEventListener('show.bs.modal', () => {
+      const { title } = post;
+      const body = post.description;
+      const url = post.link;
 
       state.modal = {
         title, body, url,
