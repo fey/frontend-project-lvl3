@@ -8,19 +8,19 @@
 </head>
 
 <body>
-  <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal fade" id="article-preview" tabindex="-1" aria-labelledby="article-preview-title" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="myModalLabel">Modal title</h5>
+          <h5 class="modal-title" id="article-preview-title">Modal title</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" id="article-preview-body">
           ...
         </div>
         <div class="modal-footer">
+          <a class="btn btn-primary" id="full-article" href="" role="button" target="_blank" rel="noopener noreferrer">Full article</a>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
         </div>
       </div>
     </div>

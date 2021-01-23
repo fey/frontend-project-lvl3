@@ -56,7 +56,7 @@ const loadPosts = (state, feed) => {
       console.log(newPosts);
       state.posts = [...newPosts, ...state.posts];
     });
-  setTimeout(() => loadPosts(state, feed), 5000);
+  // setTimeout(() => loadPosts(state, feed), 5000);
 };
 
 export default () => i18next.init({
@@ -78,9 +78,14 @@ export default () => i18next.init({
         -> failed
        */
     },
+    modal: {
+      title: '',
+      body: '',
+      url: '',
+    },
     feeds: [],
     posts: [],
-    readedPosts: [],
+    readPosts: [],
   };
   const watchedState = onChange(state, (path, value) => render(watchedState, path, value));
   const form = document.getElementById('rss-form');
@@ -127,7 +132,7 @@ export default () => i18next.init({
           text: 'success_load',
         };
 
-        setTimeout(() => loadPosts(watchedState, feed), 5000);
+        // setTimeout(() => loadPosts(watchedState, feed), 5000);
       })
       .catch((error) => {
         watchedState.form.state = FAILED;

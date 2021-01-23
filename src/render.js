@@ -38,27 +38,35 @@ const buildPostsList = (posts, state) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
     const link = document.createElement('a');
-    link.classList.add(post.isRead ? 'fw-normal' : 'fw-bold');
+    link.classList.add(post.haveRead ? 'fw-normal' : 'fw-bold');
     link.href = post.link;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.textContent = post.title;
     link.addEventListener('click', () => {
-      post.isRead = true;
+      post.haveRead = true;
     });
 
     const button = document.createElement('button');
     button.classList.add('btn', 'btn-primary', 'btn-sm');
     button.dataset.bsToggle = 'modal';
-    button.dataset.bsTarget = '#myModal';
+    button.dataset.bsTarget = '#article-preview';
     button.dataset.bsTitle = post.title;
     button.dataset.bsBody = post.description;
+    button.dataset.bsLink = post.link;
     button.textContent = i18next.t('preview');
-    const modal = document.getElementById('myModal');
+    const modal = document.getElementById('article-preview');
 
     modal.addEventListener('show.bs.modal', ({ relatedTarget }) => {
       const title = relatedTarget.dataset.bsTitle;
+      const body = relatedTarget.dataset.bsBody;
+      const url = relatedTarget.dataset.bsLink;
       console.log(title);
+      console.log(url);
+
+      state.modal = {
+        title, body, url,
+      };
     });
 
     li.append(link, button);
@@ -115,7 +123,7 @@ const renderFeeds = (feeds) => {
   feedsContainer.append(listTitle, feedsList);
 };
 
-const renderPosts = (posts) => {
+const renderPosts = (posts, state) => {
   if (posts.length === 0) {
     return;
   }
@@ -125,9 +133,21 @@ const renderPosts = (posts) => {
 
   const postsTitle = document.createElement('h2');
   postsTitle.textContent = i18next.t('posts');
-  const postsList = buildPostsList(posts);
+  const postsList = buildPostsList(posts, state);
 
   postsContainer.append(postsTitle, postsList);
+};
+
+const handleModal = ({ title, body, url }) => {
+  const modal = document.getElementById('article-preview');
+  console.log(modal);
+  const titleEl = document.getElementById('article-preview-title');
+  const bodyEl = document.getElementById('article-preview-body');
+  const linkEl = document.getElementById('full-article');
+
+  titleEl.textContent = title;
+  bodyEl.textContent = body;
+  linkEl.href = url;
 };
 
 const renderMessage = ({ type, text }) => {
@@ -174,6 +194,9 @@ const render = (state, path, value) => {
       break;
     case 'posts':
       renderPosts(value, state);
+      break;
+    case 'modal':
+      handleModal(value);
       break;
     default:
       break;
