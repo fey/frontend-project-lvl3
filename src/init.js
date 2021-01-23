@@ -1,15 +1,17 @@
 import { get } from 'axios';
 import onChange from 'on-change';
 import i18next from 'i18next';
-import { sha1 } from 'object-hash';
+import { uniqueId } from 'lodash';
 import parse from './parser';
 import validate from './validator';
 import render from './render';
+import resources from './resources';
 import {
   FILLING,
   SUBMITTED,
   SUBMITTING,
   FAILED,
+  PROXY_URL,
 } from './consts.js';
 
 const buildFeed = (rss, url) => {
@@ -17,10 +19,11 @@ const buildFeed = (rss, url) => {
     const title = item.querySelector('title').textContent;
     const link = item.querySelector('link').textContent;
     const description = item.querySelector('description').textContent;
-    const hash = sha1(JSON.stringify({ title, description, link }));
+    const guid = item.querySelector('guid');
+    const id = uniqueId();
 
     return {
-      title, description, link, hash,
+      title, description, link, guid, id,
     };
   };
   const title = rss.querySelector('channel > title').textContent;
@@ -36,14 +39,14 @@ const buildFeed = (rss, url) => {
 
 const loadPosts = (state, feed) => {
   const { url } = feed;
-  get('https://api.allorigins.win/raw', { params: { url } })
+  get(PROXY_URL, { params: { url, disableCache: true } })
     .then((res) => {
-      const parsed = parse(res.data);
-      const { posts } = buildFeed(parsed, url);
-      const newPosts = posts.filter((post) => {
-        const exists = state.posts.find((storedPost) => storedPost.hash === post.hash);
+      const parsed = parse(res.data.contents);
+      const { posts: existPosts } = buildFeed(parsed, url);
+      const newPosts = existPosts.filter((existPost) => {
+        const exists = state.posts.find((storedPost) => storedPost.guid === existPost.guid);
 
-        return Boolean(!exists);
+        return !exists;
       });
 
       if (newPosts.length === 0) {
@@ -59,37 +62,7 @@ const loadPosts = (state, feed) => {
 export default () => i18next.init({
   lng: 'en',
   debug: true,
-  resources: {
-    ru: {
-      translation: {
-        title: 'RSS Reader',
-        subtitle: 'Начните читать RSS уже сегодня! Это легко, это приятно.',
-        preview: 'Предпросмотр',
-        feeds: 'Потоки',
-        posts: 'Посты',
-        add: 'Добавить',
-        exists: 'Поток уже добавлен',
-        success_load: 'Поток загружен',
-        must_be_url: 'должен быть действительный URL-адрес',
-        something_went_wrong: 'Упс, что-то пошло не так',
-
-      },
-    },
-    en: {
-      translation: {
-        title: 'RSS Reader',
-        subtitle: 'Start reading RSS today! It is easy, it is nicely.',
-        preview: 'Preview',
-        feeds: 'Feeds',
-        posts: 'Posts',
-        add: 'Add',
-        exists: 'RSS already exists',
-        success_load: 'Rss has been loaded',
-        must_be_url: '{{value}} must be a valid URL',
-        something_went_wrong: 'Something went wrong',
-      },
-    },
-  },
+  resources,
 }).then(() => {
   const state = {
     form: {
@@ -142,9 +115,9 @@ export default () => i18next.init({
       return;
     }
 
-    get('https://api.allorigins.win/raw', { params: { url } })
+    get(PROXY_URL, { params: { url, disableCache: true } })
       .then((res) => {
-        const parsed = parse(res.data);
+        const parsed = parse(res.data.contents);
         const { feed, posts } = buildFeed(parsed, url);
         watchedState.feeds = [feed, ...watchedState.feeds];
         watchedState.posts = [...posts, ...watchedState.posts];
