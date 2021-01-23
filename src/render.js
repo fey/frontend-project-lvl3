@@ -1,5 +1,6 @@
 import i18next from 'i18next';
 import onChange from 'on-change';
+import { target } from '../node_modules/on-change/index.js';
 import {
   FILLING,
   SUBMITTED,
@@ -32,22 +33,26 @@ const buildFeedList = (feeds) => {
 
   return ul;
 };
+const markPostRead = (state, post) => {
+  state.readPosts = [...state.readPosts, post.id];
+};
 
 const buildPostsList = (posts, state) => {
   const buildItem = (post) => {
+    const readPosts = target(state.readPosts);
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
     const link = document.createElement('a');
-    link.classList.add(post.haveRead ? 'fw-normal' : 'fw-bold');
+
+    link.classList.add(readPosts.find((readId) => readId === post.id) ? 'fw-normal' : 'fw-bold');
     link.href = post.link;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.textContent = post.title;
-    link.addEventListener('click', () => {
-      post.haveRead = true;
-    });
+    link.addEventListener('click', () => markPostRead(state, post));
 
     const button = document.createElement('button');
+    button.addEventListener('click', () => markPostRead(state, post));
     button.classList.add('btn', 'btn-primary', 'btn-sm');
     button.dataset.bsToggle = 'modal';
     button.dataset.bsTarget = '#article-preview';
@@ -58,11 +63,10 @@ const buildPostsList = (posts, state) => {
     const modal = document.getElementById('article-preview');
 
     modal.addEventListener('show.bs.modal', ({ relatedTarget }) => {
+      markPostRead(state, post);
       const title = relatedTarget.dataset.bsTitle;
       const body = relatedTarget.dataset.bsBody;
       const url = relatedTarget.dataset.bsLink;
-      console.log(title);
-      console.log(url);
 
       state.modal = {
         title, body, url,
@@ -197,6 +201,9 @@ const render = (state, path, value) => {
       break;
     case 'modal':
       handleModal(value);
+      break;
+    case 'readPosts':
+      renderPosts(target(state.posts), state);
       break;
     default:
       break;

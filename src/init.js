@@ -44,9 +44,9 @@ const loadPosts = (state, feed) => {
       const parsed = parse(res.data.contents);
       const { posts: existPosts } = buildFeed(parsed, url);
       const newPosts = existPosts.filter((existPost) => {
-        const exists = state.posts.find((storedPost) => storedPost.guid === existPost.guid);
-
-        return !exists;
+        const newPostInExists = state.posts
+          .find((storedPost) => storedPost.title === existPost.title);
+        return newPostInExists === undefined;
       });
 
       if (newPosts.length === 0) {
@@ -56,7 +56,7 @@ const loadPosts = (state, feed) => {
       console.log(newPosts);
       state.posts = [...newPosts, ...state.posts];
     });
-  // setTimeout(() => loadPosts(state, feed), 5000);
+  setTimeout(() => loadPosts(state, feed), 5000);
 };
 
 export default () => i18next.init({
@@ -132,7 +132,7 @@ export default () => i18next.init({
           text: 'success_load',
         };
 
-        // setTimeout(() => loadPosts(watchedState, feed), 5000);
+        setTimeout(() => loadPosts(watchedState, feed), 5000);
       })
       .catch((error) => {
         watchedState.form.state = FAILED;
