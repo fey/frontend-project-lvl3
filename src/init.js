@@ -14,6 +14,7 @@ import {
   FAILED,
   PROXY_URL,
 } from './constants.js';
+import { param } from 'jquery';
 
 const buildFeed = (rss, url) => {
   const convertItem = (item) => {
@@ -113,27 +114,27 @@ export default () => i18next.init({
 
       return;
     }
-
-    get(PROXY_URL, { params: { url, disableCache: true } })
+    const params = param({ url, disableCache: 'true' });
+    console.log(params);
+    get(PROXY_URL + '?' + params)
       .then((res) => {
         const parsed = parse(res.data.contents);
         try {
           const { feed, posts } = buildFeed(parsed, url);
-        } catch (e) {
+          watchedState.feeds = [feed, ...watchedState.feeds];
+          watchedState.posts = [...posts, ...watchedState.posts];
+          watchedState.form.state = SUBMITTED;
+          watchedState.form.message = {
+            type: 'success',
+            text: 'success_load',
+          };
+
+          setTimeout(() => loadPosts(watchedState, feed), 5000);
+        } catch (err) {
           throw new Error(i18next.t('invalid_rss'));
         }
-        watchedState.feeds = [feed, ...watchedState.feeds];
-        watchedState.posts = [...posts, ...watchedState.posts];
-        watchedState.form.state = SUBMITTED;
-        watchedState.form.message = {
-          type: 'success',
-          text: 'success_load',
-        };
-
-        setTimeout(() => loadPosts(watchedState, feed), 5000);
       })
       .catch((error) => {
-        console.log(error);
         watchedState.form.state = FAILED;
         watchedState.form.message = {
           type: 'error',

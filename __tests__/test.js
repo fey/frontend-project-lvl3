@@ -7,6 +7,7 @@ import path from 'path';
 import userEvent from '@testing-library/user-event';
 import nock from 'nock';
 import init from '../src/init.js';
+import { param } from 'jquery';
 
 axios.defaults.adapter = require('axios/lib/adapters/http');
 
@@ -30,8 +31,10 @@ test('submit url should work', async () => {
   const fixturePath = path.join(__dirname, '__fixtures__', 'lessons.rss');
   const contents = fs.readFileSync(fixturePath).toString();
   const scope = nock('https://hexlet-allorigins.herokuapp.com')
+    // .get('/get')
     .get('/get')
-    .query(true)
+    .query({ url: 'https://ru.hexlet.io/lessons.rss', disableCache: 'true' })
+    // .query(true)
     .reply(200, {
       contents,
     });
@@ -47,9 +50,8 @@ test('submit url should work', async () => {
     expect(document.body).toHaveTextContent('Rss has been loaded');
   });
 
+  scope.done();
   expect(document.body).toHaveTextContent('Новые уроки на Хекслете');
   expect(document.body).toHaveTextContent('Практические уроки по программированию');
   expect(document.body).toHaveTextContent('Формы / Основы вёрстки контента');
-
-  scope.done();
 });
