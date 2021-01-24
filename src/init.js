@@ -116,6 +116,13 @@ export default () => i18next.init({
     }
 
     get(PROXY_URL, { params: { url, disableCache: 'true' } })
+      .catch(() => {
+        watchedState.form.state = FAILED;
+        watchedState.form.message = {
+          type: 'error',
+          text: 'network_error',
+        };
+      })
       .then((res) => {
         const parsed = parse(res.data.contents);
         try {
@@ -130,14 +137,19 @@ export default () => i18next.init({
 
           setTimeout(() => loadPosts(watchedState, feed), 5000);
         } catch (err) {
-          throw new Error(i18next.t('invalid_rss'));
+          watchedState.form.state = FAILED;
+          watchedState.form.message = {
+            type: 'error',
+            text: 'invalid_rss',
+          };
         }
       })
       .catch((error) => {
+        console.log(error);
         watchedState.form.state = FAILED;
         watchedState.form.message = {
           type: 'error',
-          text: 'network_error',
+          text: error.message,
         };
       });
   });
