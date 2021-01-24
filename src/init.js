@@ -60,7 +60,7 @@ const loadPosts = (state, feed) => {
 
 export default () => i18next.init({
   lng: 'en',
-  debug: true,
+  debug: false,
   resources,
 }).then(() => {
   const state = {
@@ -70,12 +70,6 @@ export default () => i18next.init({
         text: '',
       },
       state: FILLING,
-      /**
-       * filling
-        -> submitted
-        -> submitting
-        -> failed
-       */
     },
     modal: {
       title: '',
