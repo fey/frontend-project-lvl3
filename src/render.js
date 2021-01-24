@@ -140,8 +140,6 @@ const renderPosts = (posts, state) => {
 };
 
 const handleModal = ({ title, body, url }) => {
-  const modal = document.getElementById('article-preview');
-  console.log(modal);
   const titleEl = document.getElementById('article-preview-title');
   const bodyEl = document.getElementById('article-preview-body');
   const linkEl = document.getElementById('full-article');
@@ -179,7 +177,6 @@ const renderMessage = ({ type, text }) => {
 };
 
 const render = (state, path, value) => {
-  console.log(onChange.target(state));
   const submit = document.getElementById('form-submit');
   submit.value = i18next.t('add');
 

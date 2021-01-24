@@ -53,7 +53,6 @@ const loadPosts = (state, feed) => {
         return;
       }
 
-      console.log(newPosts);
       state.posts = [...newPosts, ...state.posts];
     });
   setTimeout(() => loadPosts(state, feed), 5000);
