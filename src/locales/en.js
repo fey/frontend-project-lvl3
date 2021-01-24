@@ -8,7 +8,7 @@ export default {
     add: 'Add',
     exists: 'RSS already exists',
     success_load: 'Rss has been loaded',
-    must_be_url: '{{value}} must be a valid URL',
+    must_be_url: 'must be valid URL',
     something_went_wrong: 'Something went wrong',
   },
 };
