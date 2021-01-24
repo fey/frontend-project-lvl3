@@ -137,7 +137,6 @@ export default () => i18next.init({
         }
       })
       .catch((error) => {
-        console.log(error);
         watchedState.form.state = FAILED;
         watchedState.form.message = {
           type: 'error',
