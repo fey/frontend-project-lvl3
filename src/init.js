@@ -114,9 +114,8 @@ export default () => i18next.init({
 
       return;
     }
-    const params = param({ url, disableCache: 'true' });
-    console.log(params);
-    get(PROXY_URL + '?' + params)
+
+    get(PROXY_URL, { params: { url, disableCache: 'true' } })
       .then((res) => {
         const parsed = parse(res.data.contents);
         try {
