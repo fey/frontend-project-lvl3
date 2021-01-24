@@ -1,12 +1,14 @@
 /* eslint-disable jest/expect-expect */
+import axios from 'axios';
 import '@testing-library/jest-dom';
 import { screen, waitFor } from '@testing-library/dom';
 import fs from 'fs';
 import path from 'path';
-import userEvent from '@testing-library/user-event'
+import userEvent from '@testing-library/user-event';
 import nock from 'nock';
 import init from '../src/init.js';
-import { PROXY_URL } from '../src/constants.js';
+
+axios.defaults.adapter = require('axios/lib/adapters/http');
 
 nock.disableNetConnect();
 // let elements;
@@ -25,14 +27,16 @@ test('should work', async () => {
 });
 
 test('submit url should work', async () => {
-  const scope = nock('hexlet-allorigins.herokuapp.com')
-    .get('/get') //{ url: 'https://ru.hexlet.io/lessons.rss', disableCache: true })
-    .reply(200);
-    // .replyWithFile(200, path.join(__dirname, '__fixtures__', 'lessons.rss'), {
-    //   'Content-type': 'application/rss+xml; charset=utf-8',
-    // });
+  const fixturePath = path.join(__dirname, '__fixtures__', 'lessons.rss');
+  const contents = fs.readFileSync(fixturePath).toString();
+  const scope = nock('https://hexlet-allorigins.herokuapp.com')
+    .get('/get')
+    .query(true)
+    .reply(200, {
+      contents,
+    });
 
-  const urlElement = screen.getByRole('textbox', { selector: '#form-url' });
+  const urlElement = screen.getByRole('textbox', { name: 'url' });
   const submitElement = screen.getByText(/Add/);
 
   await userEvent.type(urlElement, 'https://ru.hexlet.io/lessons.rss');
@@ -42,6 +46,10 @@ test('submit url should work', async () => {
   await waitFor(() => {
     expect(document.body).toHaveTextContent('Rss has been loaded');
   });
+
+  expect(document.body).toHaveTextContent('Новые уроки на Хекслете');
+  expect(document.body).toHaveTextContent('Практические уроки по программированию');
+  expect(document.body).toHaveTextContent('Формы / Основы вёрстки контента');
 
   scope.done();
 });

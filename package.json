@@ -4,7 +4,7 @@
   "description": "Rss Reader is a service for aggregating RSS feeds",
   "main": "src/init.js",
   "scripts": {
-    "test": "npx jest --no-warnings"
+    "test": "npx -n --experimental-vm-modules -n --no-warnings jest --no-warnings"
   },
   "repository": {
     "type": "git",

@@ -150,7 +150,7 @@ const handleModal = ({ title, body, url }) => {
 };
 
 const renderMessage = ({ type, text }) => {
-  const submit = document.getElementById('form-submit');
+  const submit = document.getElementById('submit');
   let feedback = document.getElementById('form-message');
 
   if (!feedback) {
@@ -177,7 +177,7 @@ const renderMessage = ({ type, text }) => {
 };
 
 const render = (state, path, value) => {
-  const submit = document.getElementById('form-submit');
+  const submit = document.getElementById('submit');
   submit.value = i18next.t('add');
 
   switch (path) {
