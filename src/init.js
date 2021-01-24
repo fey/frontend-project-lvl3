@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { get } from 'axios';
 import onChange from 'on-change';
 import i18next from 'i18next';
@@ -5,14 +6,14 @@ import { uniqueId } from 'lodash';
 import parse from './parser';
 import validate from './validator';
 import render from './render';
-import resources from './resources';
+import resources from './locales';
 import {
   FILLING,
   SUBMITTED,
   SUBMITTING,
   FAILED,
   PROXY_URL,
-} from './consts.js';
+} from './constants.js';
 
 const buildFeed = (rss, url) => {
   const convertItem = (item) => {

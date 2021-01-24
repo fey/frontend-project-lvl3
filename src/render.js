@@ -1,5 +1,5 @@
 import i18next from 'i18next';
-import onChange, { target } from 'on-change';
+import { target } from 'on-change';
 
 import {
   FILLING,
@@ -8,7 +8,7 @@ import {
   FAILED,
   SUCCESS,
   ERROR,
-} from './consts.js';
+} from './constants.js';
 
 const buildFeedList = (feeds) => {
   const buildFeedListItem = (feed) => {
