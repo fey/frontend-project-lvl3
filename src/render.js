@@ -96,12 +96,15 @@ const handleForm = (stateValue) => {
     case SUBMITTED:
       submit.disabled = false;
       input.value = '';
+      input.readOnly = false;
       break;
     case SUBMITTING:
       submit.disabled = true;
+      input.readOnly = true;
       break;
     case FAILED:
       submit.disabled = false;
+      input.readOnly = true;
       input.classList.add('is-invalid');
       break;
     default:
