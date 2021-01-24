@@ -117,7 +117,11 @@ export default () => i18next.init({
     get(PROXY_URL, { params: { url, disableCache: true } })
       .then((res) => {
         const parsed = parse(res.data.contents);
-        const { feed, posts } = buildFeed(parsed, url);
+        try {
+          const { feed, posts } = buildFeed(parsed, url);
+        } catch (e) {
+          throw new Error(i18next.t('invalid_rss'));
+        }
         watchedState.feeds = [feed, ...watchedState.feeds];
         watchedState.posts = [...posts, ...watchedState.posts];
         watchedState.form.state = SUBMITTED;
@@ -129,6 +133,7 @@ export default () => i18next.init({
         setTimeout(() => loadPosts(watchedState, feed), 5000);
       })
       .catch((error) => {
+        console.log(error);
         watchedState.form.state = FAILED;
         watchedState.form.message = {
           type: 'error',
