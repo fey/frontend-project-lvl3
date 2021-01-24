@@ -2,6 +2,7 @@
   "name": "@hexlet/code",
   "version": "0.1.0",
   "description": "Rss Reader is a service for aggregating RSS feeds",
+  "main": "src/init.js",
   "scripts": {
     "test": "jest --colors"
   },
