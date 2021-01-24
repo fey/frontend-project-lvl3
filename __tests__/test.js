@@ -31,10 +31,9 @@ test('submit url should work', async () => {
   const fixturePath = path.join(__dirname, '__fixtures__', 'lessons.rss');
   const contents = fs.readFileSync(fixturePath).toString();
   const scope = nock('https://hexlet-allorigins.herokuapp.com')
-    // .get('/get')
+
     .get('/get')
     .query({ url: 'https://ru.hexlet.io/lessons.rss', disableCache: 'true' })
-    // .query(true)
     .reply(200, {
       contents,
     });

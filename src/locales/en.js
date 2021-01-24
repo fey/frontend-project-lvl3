@@ -11,5 +11,6 @@ export default {
     must_be_url: 'must be valid URL',
     invalid_rss: 'This source doesn\'t contain valid rss',
     something_went_wrong: 'Something went wrong',
+    network_error: 'Network error',
   },
 };

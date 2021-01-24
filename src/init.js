@@ -137,8 +137,7 @@ export default () => i18next.init({
         watchedState.form.state = FAILED;
         watchedState.form.message = {
           type: 'error',
-          text: error,
-          // text: 'something_went_wrong',
+          text: 'network_error',
         };
       });
   });
