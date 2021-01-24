@@ -120,20 +120,21 @@ export default () => i18next.init({
         throw Error('network_error');
       })
       .then((res) => {
-        const feedData = parse(res.data.contents);
-        const { feed, posts } = buildFeed(feedData, url);
-        watchedState.feeds = [feed, ...watchedState.feeds];
-        watchedState.posts = [...posts, ...watchedState.posts];
-        watchedState.form.state = SUBMITTED;
-        watchedState.form.message = {
-          type: 'success',
-          text: 'success_load',
-        };
+        try {
+          const feedData = parse(res.data.contents);
+          const { feed, posts } = buildFeed(feedData, url);
+          watchedState.feeds = [feed, ...watchedState.feeds];
+          watchedState.posts = [...posts, ...watchedState.posts];
+          watchedState.form.state = SUBMITTED;
+          watchedState.form.message = {
+            type: 'success',
+            text: 'success_load',
+          };
 
-        setTimeout(() => loadPosts(watchedState, feed), 5000);
-      })
-      .catch(() => {
-        throw Error('invalid_rss');
+          setTimeout(() => loadPosts(watchedState, feed), 5000);
+        } catch (e) {
+          throw Error('invalid_rss');
+        }
       })
       .catch((error) => {
         console.log(error);
