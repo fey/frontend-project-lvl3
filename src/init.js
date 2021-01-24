@@ -129,6 +129,7 @@ export default () => i18next.init({
         setTimeout(() => loadPosts(watchedState, feed), 5000);
       })
       .catch((error) => {
+        console.log(error);
         watchedState.form.state = FAILED;
         watchedState.form.message = {
           type: 'error',

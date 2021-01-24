@@ -86,8 +86,8 @@ const buildPostsList = (posts, state) => {
 };
 
 const handleForm = (stateValue) => {
-  const input = document.getElementById('form-url');
-  const submit = document.getElementById('form-submit');
+  const input = document.getElementById('url');
+  const submit = document.getElementById('submit');
   input.classList.remove('is-invalid');
   submit.value = i18next.t('add');
 
