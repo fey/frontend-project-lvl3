@@ -7,7 +7,6 @@ import path from 'path';
 import userEvent from '@testing-library/user-event';
 import nock from 'nock';
 import init from '../src/init.js';
-import { param } from 'jquery';
 
 axios.defaults.adapter = require('axios/lib/adapters/http');
 

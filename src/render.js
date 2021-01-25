@@ -152,13 +152,10 @@ const handleModal = ({ title, body, url }) => {
 
 const renderMessage = ({ type, text }) => {
   const submit = document.getElementById('submit');
-  let feedback = document.getElementById('form-message');
+  const feedback = document.getElementById('form-message') || document.createElement('div');
 
-  if (!feedback) {
-    feedback = document.createElement('div');
-    feedback.id = 'form-message';
-    feedback.classList.add('feedback');
-  }
+  feedback.id = 'form-message';
+  feedback.classList.add('feedback');
 
   switch (type) {
     case SUCCESS:

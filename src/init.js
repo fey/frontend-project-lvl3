@@ -8,7 +8,6 @@ import validate from './validator';
 import render from './render';
 import resources from './locales';
 import 'bootstrap';
-
 import {
   FILLING,
   SUBMITTED,
@@ -16,7 +15,6 @@ import {
   FAILED,
   PROXY_URL,
 } from './constants.js';
-import { param } from 'jquery';
 
 const buildFeed = (rss, url) => {
   const convertItem = (item) => {
@@ -134,7 +132,7 @@ export default () => i18next.init({
           };
 
           setTimeout(() => loadPosts(watchedState, feed), 5000);
-        } catch (e) {
+        } catch (error) {
           throw Error('invalid_rss');
         }
       })
