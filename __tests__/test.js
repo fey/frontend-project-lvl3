@@ -23,7 +23,7 @@ beforeEach(async () => {
 test('should work', async () => {
   expect(screen.getByText('RSS Reader', { selector: 'h1' })).toBeInTheDocument();
   expect(screen.queryByText('Start reading RSS today! It is easy, it is nicely.')).toBeInTheDocument();
-  expect(screen.getByText(/Add/)).not.toBeDisabled();
+  expect(screen.getByText(/Add/)).toBeEnabled();
 });
 
 test('submit url should work', async () => {
