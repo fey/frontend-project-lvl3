@@ -53,19 +53,16 @@ const buildPostsList = (posts, state) => {
     link.addEventListener('click', () => markPostRead(state, post));
 
     const button = document.createElement('button');
-    button.addEventListener('click', () => markPostRead(state, post));
     button.classList.add('btn', 'btn-primary', 'btn-sm');
     button.dataset.bsToggle = 'modal';
     button.dataset.bsTarget = '#article-preview';
+    button.dataset.id = post.id;
     button.textContent = i18next.t('preview');
-    const modal = document.getElementById('article-preview');
-    button.addEventListener('click', () => markPostRead(state, post));
-
-    modal.addEventListener('show.bs.modal', () => {
+    button.addEventListener('click', () => {
+      markPostRead(state, post);
       const { title } = post;
       const body = post.description;
       const url = post.link;
-
       state.modal = {
         title, body, url,
       };

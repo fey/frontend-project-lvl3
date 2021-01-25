@@ -7,6 +7,8 @@ import parse from './parser';
 import validate from './validator';
 import render from './render';
 import resources from './locales';
+import 'bootstrap';
+
 import {
   FILLING,
   SUBMITTED,
