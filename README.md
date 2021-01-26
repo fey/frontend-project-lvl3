@@ -4,7 +4,7 @@
 
 ### Description
 
-https://fey-frontend-project-lvl3-9egbr5057.vercel.app/
+http://fey-frontend-project-lvl3.vercel.app/
 
 Rss Reader is a service for aggregating RSS feeds that makes it easy to read a variety of sources, such as blogs. It allows you to add an unlimited number of RSS feeds, updates them and adds new entries to the total stream.
 
