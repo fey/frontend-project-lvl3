@@ -10,7 +10,6 @@ Rss Reader is a service for aggregating RSS feeds that makes it easy to read a v
 
 ### Commands
 
-
 ```sh
 $ make install
 $ make develop
