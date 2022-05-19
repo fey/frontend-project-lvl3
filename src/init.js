@@ -3,10 +3,10 @@ import { get } from 'axios';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import { uniqueId } from 'lodash';
-import parse from './parser';
-import validate from './validator';
-import render from './render';
-import resources from './locales';
+import parse from './parser.js';
+import validate from './validator.js';
+import render from './render.js';
+import resources from './locales/index.js';
 import 'bootstrap';
 import {
   FILLING,
